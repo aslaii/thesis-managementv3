@@ -23,6 +23,8 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
+
+
 function LinearProgressWithLabel(props) {
   return (
     <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -63,7 +65,7 @@ const ViewThesisModal = ({ open, handleClose, thesisData }) => {
             <Typography>Year: {thesisData?.year}</Typography>
           </Stack>
           <Stack direction="row" spacing={2} alignItems="center" sx={{ my: 1 }}>
-            <SchoolIcon color="primary" color="primary" />
+            <SchoolIcon color="primary" />
             <Typography>Term: {thesisData?.term}</Typography>
           </Stack>
           <Stack direction="row" spacing={2} alignItems="center" sx={{ my: 1 }}>

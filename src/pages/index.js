@@ -1,6 +1,19 @@
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
-import { Box, Button, Container, Stack, SvgIcon, Typography, IconButton } from "@mui/material";
+import {
+  Box,
+  Button,
+  Container,
+  Stack,
+  SvgIcon,
+  Typography,
+  IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
 import { DataGrid } from "@mui/x-data-grid";
 import ThesisModal from "src/sections/thesis/thesis-modal";
@@ -23,6 +36,8 @@ const Page = () => {
   const [theses, setTheses] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
   const [editingThesis, setEditingThesis] = useState(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [selectedIdForDelete, setSelectedIdForDelete] = useState(null);
 
   const handleSubmitThesis = async (formData) => {
     if (isEdit && editingThesis) {
@@ -63,6 +78,20 @@ const Page = () => {
 
   const handleCloseModal = () => setOpenModal(false);
 
+  const handleDeleteOpen = (id) => {
+    setSelectedIdForDelete(id);
+    setDeleteOpen(true);
+  };
+
+  const handleDeleteClose = () => {
+    setDeleteOpen(false);
+  };
+
+  const handleDelete = () => {
+    deleteThesis(selectedIdForDelete);
+    setDeleteOpen(false);
+  };
+
   const columns = [
     {
       field: "Actions",
@@ -92,6 +121,7 @@ const Page = () => {
             color="error"
             onClick={() => {
               /* handle delete action */
+              handleDeleteOpen(params.row.id);
               console.log(params.row.id);
             }}
           >
@@ -113,6 +143,27 @@ const Page = () => {
       <Head>
         <title>Thesis Manager</title>
       </Head>
+      <Dialog
+        open={deleteOpen}
+        onClose={handleDeleteClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Confirm Delete"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteClose} color="primary">
+            Disagree
+          </Button>
+          <Button onClick={handleDelete} color="primary" autoFocus>
+            Agree
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Box component="main" sx={{ flexGrow: 1, py: 8 }}>
         <Container maxWidth="xl">
           <Stack spacing={3}>

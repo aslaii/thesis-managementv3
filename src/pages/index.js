@@ -10,7 +10,13 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { viewAllThesis, addThesis, viewThesis, deleteThesis, editThesis } from "src/utils/thesis";
+import {
+  viewAllThesisRealtime,
+  addThesis,
+  viewThesis,
+  deleteThesis,
+  editThesis,
+} from "src/utils/thesis";
 
 const Page = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -19,30 +25,34 @@ const Page = () => {
   const [editingThesis, setEditingThesis] = useState(null);
 
   const handleSubmitThesis = async (formData) => {
-    if (isEdit) {
-      // Assume editingThesis contains the original ID needed for editing
+    if (isEdit && editingThesis) {
       await editThesis(editingThesis.id, formData);
+      // Optimistically update the UI
+      setTheses(
+        theses.map((t) =>
+          t.id === editingThesis.id ? { ...t, ...formData, createdAt: t.createdAt } : t
+        )
+      );
     } else {
-      await addThesis(formData);
+      const newThesis = await addThesis(formData);
+      // Assuming addThesis returns the new thesis with its ID
+      setTheses([
+        ...theses,
+        {
+          ...newThesis,
+          createdAt: new Date(newThesis.created_at.seconds * 1000).toLocaleDateString(),
+        },
+      ]);
     }
-    // Close modal and refresh thesis list or handle state update accordingly
     handleCloseModal();
-    // Optionally, refresh your theses list here if not using real-time updates
   };
 
   useEffect(() => {
-    const fetchTheses = async () => {
-      const allTheses = await viewAllThesis();
-      setTheses(
-        allTheses.map((thesis, index) => ({
-          ...thesis,
-          id: thesis.id,
-          createdAt: new Date(thesis.created_at.seconds * 1000).toLocaleDateString(), // Convert to Date string
-        }))
-      );
-    };
+    const unsubscribe = viewAllThesisRealtime((newTheses) => {
+      setTheses(newTheses);
+    });
 
-    fetchTheses();
+    return () => unsubscribe();
   }, []);
 
   const handleOpenModal = (editMode = false, thesisData = null) => {

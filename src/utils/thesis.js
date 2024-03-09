@@ -6,7 +6,8 @@ import {
   deleteDoc,
   updateDoc,
   getDoc,
-  getDocs,
+  onSnapshot,
+  query,
 } from "firebase/firestore";
 
 // Initialize Firestore
@@ -97,19 +98,26 @@ const viewThesis = async (id) => {
     console.error("Error getting document:", error);
   }
 };
-const viewAllThesis = async () => {
-  try {
-    const querySnapshot = await getDocs(thesisCollection);
-    const thesisList = [];
+
+const viewAllThesisRealtime = (callback) => {
+  const q = query(collection(firestore, "thesis"));
+
+  const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    const theses = [];
     querySnapshot.forEach((doc) => {
-      thesisList.push({ id: doc.id, ...doc.data() });
+      theses.push({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().created_at
+          ? new Date(doc.data().created_at.seconds * 1000).toLocaleDateString()
+          : "N/A",
+      });
     });
-    console.log("Fetched all thesis records:", thesisList);
-    return thesisList;
-  } catch (error) {
-    console.error("Error getting documents:", error);
-  }
+    callback(theses);
+  });
+
+  return unsubscribe;
 };
 
 // Exporting the functions
-export { viewAllThesis, addThesis, deleteThesis, editThesis, viewThesis };
+export { viewAllThesisRealtime, addThesis, deleteThesis, editThesis, viewThesis };

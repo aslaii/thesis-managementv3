@@ -23,7 +23,7 @@
     "@mui/lab": "5.0.0-alpha.120",
     "@mui/material": "^5.11.10",
     "@mui/system": "5.11.9",
-    "@mui/x-data-grid": "^6.18.4",
+    "@mui/x-data-grid": "^6.19.6",
     "@mui/x-date-pickers": "5.0.19",
     "apexcharts": "3.37.0",
     "date-fns": "2.29.3",

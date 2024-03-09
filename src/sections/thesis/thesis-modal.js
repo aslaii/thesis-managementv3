@@ -11,9 +11,12 @@ import {
   InputLabel,
   SvgIcon,
   Grid,
+  InputAdornment,
 } from "@mui/material";
 
-// Modal style
+// Assuming you've imported the editThesis function correctly
+import { editThesis } from "src/utils/thesis";
+
 const style = {
   position: "absolute",
   top: "50%",
@@ -25,7 +28,7 @@ const style = {
   p: 4,
 };
 
-const ThesisModal = ({ open, handleClose, thesisData, onSubmit }) => {
+const ThesisModal = ({ open, handleClose, thesisData, onSubmit, isEdit = false }) => {
   const [formData, setFormData] = useState({
     year: "",
     term: "",
@@ -38,10 +41,11 @@ const ThesisModal = ({ open, handleClose, thesisData, onSubmit }) => {
     group_members: "",
     advisers: "",
     panel_members: "",
+    remarks: "",
+    progress: 0,
   });
 
   useEffect(() => {
-    // If thesisData is provided, populate the form for editing
     if (thesisData) {
       setFormData(thesisData);
     }
@@ -55,9 +59,13 @@ const ThesisModal = ({ open, handleClose, thesisData, onSubmit }) => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    if (isEdit && thesisData?.id) {
+      await editThesis(thesisData.id, formData); // Use editThesis for updating
+    } else {
+      onSubmit(formData); // Fallback or different logic for adding
+    }
     handleClose();
   };
 
@@ -70,7 +78,7 @@ const ThesisModal = ({ open, handleClose, thesisData, onSubmit }) => {
     >
       <Box sx={style}>
         <Typography id="modal-modal-title" variant="h6" component="h2">
-          {thesisData ? "Edit Thesis" : "Add Thesis"}
+          {isEdit ? "Edit Thesis" : "Add Thesis"}
         </Typography>
         <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit}>
           <Grid container spacing={3}>
@@ -206,6 +214,37 @@ const ThesisModal = ({ open, handleClose, thesisData, onSubmit }) => {
                 onChange={handleInputChange}
               />
             </Grid>
+            {isEdit && (
+              <>
+                <Grid item xs={12}>
+                  {/* Remarks Input */}
+                  <TextField
+                    fullWidth
+                    margin="normal"
+                    label="Remarks"
+                    name="remarks"
+                    value={formData.remarks}
+                    onChange={handleInputChange}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  {/* Progress Input */}
+                  <TextField
+                    fullWidth
+                    type="number"
+                    margin="normal"
+                    label="Progress"
+                    name="progress"
+                    value={formData.progress}
+                    onChange={handleInputChange}
+                    InputProps={{
+                      endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                      inputProps: { min: 0, max: 100 },
+                    }}
+                  />
+                </Grid>
+              </>
+            )}
             <Grid item xs={12}>
               <Button type="submit" variant="contained" sx={{ mt: 3 }}>
                 Submit
@@ -219,20 +258,3 @@ const ThesisModal = ({ open, handleClose, thesisData, onSubmit }) => {
 };
 
 export default ThesisModal;
-
-// Example usage in a parent component
-// const [openModal, setOpenModal] = useState(false);
-// const handleOpenModal = () => setOpenModal(true);
-// const handleCloseModal = () => setOpenModal(false);
-// const handleSubmitThesis = (formData) => {
-//   console.log(formData);
-//   // Here you'd call the addThesis or editThesis util function
-// };
-// <Button
-//   startIcon={<SvgIcon fontSize="small"><PlusIcon /></SvgIcon>}
-//   variant="contained"
-//   onClick={handleOpenModal}
-// >
-//   Add
-// </Button>
-// <ThesisModal open={openModal} handleClose={handleCloseModal} onSubmit={handleSubmitThesis} />

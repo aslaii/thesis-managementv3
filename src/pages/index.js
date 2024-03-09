@@ -1,65 +1,102 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Head from "next/head";
-import { Box, Button, Container, Stack, SvgIcon, Typography } from "@mui/material";
+import { Box, Button, Container, Stack, SvgIcon, Typography, IconButton } from "@mui/material";
 import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
-import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
-import { ThesisTable } from "src/sections/thesis/thesis-table";
-import { ThesisSearch } from "src/sections/thesis/thesis-search";
-import { applyPagination } from "src/utils/apply-pagination";
-import { addThesis, viewAllThesis } from "src/utils/thesis";
+import { DataGrid } from "@mui/x-data-grid";
 import ThesisModal from "src/sections/thesis/thesis-modal";
-import { useSelection } from "src/hooks/use-selection";
+import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 
-// Dummy data replaced by Firebase data fetching
-// const data = [];
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
-const useTheses = (page, rowsPerPage) => {
+import { viewAllThesis, addThesis, viewThesis, deleteThesis, editThesis } from "src/utils/thesis";
+
+const Page = () => {
+  const [openModal, setOpenModal] = useState(false);
   const [theses, setTheses] = useState([]);
+  const [isEdit, setIsEdit] = useState(false);
+  const [editingThesis, setEditingThesis] = useState(null);
+
+  const handleSubmitThesis = async (formData) => {
+    if (isEdit) {
+      // Assume editingThesis contains the original ID needed for editing
+      await editThesis(editingThesis.id, formData);
+    } else {
+      await addThesis(formData);
+    }
+    // Close modal and refresh thesis list or handle state update accordingly
+    handleCloseModal();
+    // Optionally, refresh your theses list here if not using real-time updates
+  };
 
   useEffect(() => {
     const fetchTheses = async () => {
       const allTheses = await viewAllThesis();
-      if (allTheses) {
-        console.log(allTheses);
-        setTheses(allTheses);
-      }
+      setTheses(
+        allTheses.map((thesis, index) => ({
+          ...thesis,
+          id: thesis.id,
+          createdAt: new Date(thesis.created_at.seconds * 1000).toLocaleDateString(), // Convert to Date string
+        }))
+      );
     };
 
     fetchTheses();
   }, []);
 
-  return useMemo(() => {
-    return applyPagination(theses, page, rowsPerPage);
-  }, [theses, page, rowsPerPage]);
-};
-
-const useThesisIds = (theses) => {
-  return useMemo(() => {
-    return theses.map((thesis) => thesis.id);
-  }, [theses]);
-};
-
-const Page = () => {
-  const [openModal, setOpenModal] = useState(false);
-  const handleOpenModal = () => setOpenModal(true);
-  const handleCloseModal = () => setOpenModal(false);
-  const handleSubmitThesis = (formData) => {
-    console.log(formData);
-    addThesis(formData);
+  const handleOpenModal = (editMode = false, thesisData = null) => {
+    setIsEdit(editMode);
+    setEditingThesis(thesisData);
+    setOpenModal(true);
   };
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const theses = useTheses(page, rowsPerPage);
-  const thesisIds = useThesisIds(theses);
-  const thesisSelection = useSelection(thesisIds);
 
-  const handlePageChange = useCallback((event, value) => {
-    setPage(value);
-  }, []);
+  const handleCloseModal = () => setOpenModal(false);
 
-  const handleRowsPerPageChange = useCallback((event) => {
-    setRowsPerPage(event.target.value);
-  }, []);
+  const columns = [
+    {
+      field: "Actions",
+      headerName: "Actions",
+      width: 150,
+      renderCell: (params) => (
+        <Stack direction="row" spacing={0}>
+          <IconButton
+            color="primary"
+            onClick={() => {
+              /* handle view action */
+              console.log(params.row.id);
+            }}
+          >
+            <VisibilityIcon />
+          </IconButton>
+          <IconButton
+            color="primary"
+            onClick={() => {
+              const thesisData = theses.find((thesis) => thesis.id === params.row.id);
+              handleOpenModal(true, thesisData);
+            }}
+          >
+            <EditIcon />
+          </IconButton>
+          <IconButton
+            color="error"
+            onClick={() => {
+              /* handle delete action */
+              console.log(params.row.id);
+            }}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Stack>
+      ),
+    },
+    { field: "group_members", headerName: "Group Members", width: 200 },
+    { field: "topic_title", headerName: "Title", width: 200 },
+    { field: "advisers", headerName: "Adviser", width: 150 },
+    { field: "createdAt", headerName: "Started At", width: 150 },
+    { field: "progress", headerName: "Progress", width: 150 },
+    { field: "remarks", headerName: "Remarks", width: 150 },
+  ];
 
   return (
     <>
@@ -78,33 +115,27 @@ const Page = () => {
                   </SvgIcon>
                 }
                 variant="contained"
-                onClick={handleOpenModal}
+                onClick={() => handleOpenModal(false, null)}
               >
                 Add Thesis
               </Button>
             </Stack>
-            <ThesisSearch />
-            {/* <ThesisTable
-              count={theses.length}
-              items={theses}
-              onDeselectAll={thesisSelection.handleDeselectAll}
-              onDeselectOne={thesisSelection.handleDeselectOne}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              onSelectAll={thesisSelection.handleSelectAll}
-              onSelectOne={thesisSelection.handleSelectOne}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              selected={thesisSelection.selected}
-            /> */}
+            <div style={{ height: "calc(100vh - 225px)", width: "100%" }}>
+              <DataGrid rows={theses} columns={columns} />
+            </div>
           </Stack>
         </Container>
       </Box>
-      <ThesisModal open={openModal} handleClose={handleCloseModal} onSubmit={handleSubmitThesis} />
+      <ThesisModal
+        open={openModal}
+        handleClose={handleCloseModal}
+        onSubmit={handleSubmitThesis}
+        isEdit={isEdit}
+        thesisData={editingThesis}
+      />
     </>
   );
 };
-
 Page.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
 
 export default Page;

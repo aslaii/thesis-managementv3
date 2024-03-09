@@ -90,13 +90,13 @@ export const ThesisTable = (props) => {
                     </TableCell>
                     <TableCell>
                       <Stack alignItems="center" direction="row" spacing={2}>
-                        <Avatar src={thesis.avatar}>{getInitials(thesis.name)}</Avatar>
-                        <Typography variant="subtitle2">{thesis.name}</Typography>
+                        <Avatar src={thesis.avatar}>{getInitials(thesis.group_members)}</Avatar>
+                        <Typography variant="subtitle2">{thesis.group_members}</Typography>
                       </Stack>
                     </TableCell>
-                    <TableCell>{thesis.title}</TableCell>
-                    <TableCell>{thesis.adviser}</TableCell>
-                    <TableCell>{thesis.started}</TableCell>
+                    <TableCell>{thesis.topic_title}</TableCell>
+                    <TableCell>{thesis.advisers}</TableCell>
+                    <TableCell>{thesis.created_at}</TableCell>
                     <TableCell>{thesis.progress}</TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={1}>

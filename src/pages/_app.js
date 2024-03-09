@@ -9,6 +9,7 @@ import { createTheme } from "src/theme";
 import { createEmotionCache } from "src/utils/create-emotion-cache";
 import "simplebar-react/dist/simplebar.min.css";
 import useAuthStore from "src/store/authStore"; // Import your Zustand store here
+import { useEffect } from "react";
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -23,6 +24,12 @@ const App = (props) => {
   const getLayout = Component.getLayout ?? ((page) => page);
 
   const theme = createTheme();
+
+  const initializeAuth = useAuthStore((state) => state.initializeAuth);
+
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
 
   return (
     <CacheProvider value={emotionCache}>

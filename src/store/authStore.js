@@ -1,5 +1,10 @@
 import { create } from "zustand";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+} from "firebase/auth";
 import { auth } from "src/utils/firebase"; // Adjust the path as necessary
 import { firestore } from "src/utils/firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
@@ -8,6 +13,7 @@ const useAuthStore = create((set) => ({
   user: null,
   isAuthenticated: false,
   isLoading: false, // Add isLoading state
+  initialAuthCheckDone: false,
 
   register: async (email, password, name) => {
     set({ isLoading: true }); // Set loading to true at the start
@@ -72,6 +78,18 @@ const useAuthStore = create((set) => ({
       set({ isLoading: false }); // Ensure loading is set to false on error
       throw error;
     }
+  },
+  initializeAuth: () => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in
+        set({ isAuthenticated: true, user });
+      } else {
+        // User is signed out
+        set({ isAuthenticated: false, user: null });
+      }
+      set({ initialAuthCheckDone: true });
+    });
   },
 }));
 

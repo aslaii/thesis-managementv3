@@ -68,7 +68,7 @@ export const SideNav = (props) => {
           >
             <div>
               <Typography color="inherit" variant="subtitle1">
-                Trash
+                Thesis Manager
               </Typography>
               <Typography color="neutral.400" variant="body2">
                 Web Application
@@ -120,11 +120,7 @@ export const SideNav = (props) => {
             px: 2,
             py: 3,
           }}
-        >
-          <Button component="a" fullWidth sx={{ mt: 2 }} target="_blank" variant="contained">
-            Pro Mode{" "}
-          </Button>
-        </Box>
+        ></Box>
       </Box>
     </Scrollbar>
   );

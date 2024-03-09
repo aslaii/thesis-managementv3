@@ -6,17 +6,14 @@ export const CustomersSearch = () => (
     <OutlinedInput
       defaultValue=""
       fullWidth
-      placeholder="Search customer"
-      startAdornment={(
+      placeholder="Search Thesis"
+      startAdornment={
         <InputAdornment position="start">
-          <SvgIcon
-            color="action"
-            fontSize="small"
-          >
+          <SvgIcon color="action" fontSize="small">
             <MagnifyingGlassIcon />
           </SvgIcon>
         </InputAdornment>
-      )}
+      }
       sx={{ maxWidth: 500 }}
     />
   </Card>

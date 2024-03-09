@@ -18,52 +18,52 @@ export const items = [
       </SvgIcon>
     ),
   },
-  {
-    title: "Route Optimization",
-    path: "/customers",
-    icon: (
-      <SvgIcon fontSize="small">
-        <UsersIcon />
-      </SvgIcon>
-    ),
-  },
+  // {
+  //   title: "Route Optimization",
+  //   path: "/customers",
+  //   icon: (
+  //     <SvgIcon fontSize="small">
+  //       <UsersIcon />
+  //     </SvgIcon>
+  //   ),
+  // },
 
-  {
-    title: "Mock Data",
-    path: "/mockdata",
-    icon: (
-      <SvgIcon fontSize="small">
-        <UsersIcon />
-      </SvgIcon>
-    ),
-  },
-  {
-    title: "Report and Analysis",
-    path: "/companies",
-    icon: (
-      <SvgIcon fontSize="small">
-        <ShoppingBagIcon />
-      </SvgIcon>
-    ),
-  },
-  {
-    title: "Account",
-    path: "/account",
-    icon: (
-      <SvgIcon fontSize="small">
-        <UserIcon />
-      </SvgIcon>
-    ),
-  },
-  {
-    title: "Settings",
-    path: "/settings",
-    icon: (
-      <SvgIcon fontSize="small">
-        <CogIcon />
-      </SvgIcon>
-    ),
-  },
+  // {
+  //   title: "Mock Data",
+  //   path: "/mockdata",
+  //   icon: (
+  //     <SvgIcon fontSize="small">
+  //       <UsersIcon />
+  //     </SvgIcon>
+  //   ),
+  // },
+  // {
+  //   title: "Report and Analysis",
+  //   path: "/companies",
+  //   icon: (
+  //     <SvgIcon fontSize="small">
+  //       <ShoppingBagIcon />
+  //     </SvgIcon>
+  //   ),
+  // },
+  // {
+  //   title: "Account",
+  //   path: "/account",
+  //   icon: (
+  //     <SvgIcon fontSize="small">
+  //       <UserIcon />
+  //     </SvgIcon>
+  //   ),
+  // },
+  // {
+  //   title: "Settings",
+  //   path: "/settings",
+  //   icon: (
+  //     <SvgIcon fontSize="small">
+  //       <CogIcon />
+  //     </SvgIcon>
+  //   ),
+  // },
   // {
   //   title: "Login",
   //   path: "/auth/login",

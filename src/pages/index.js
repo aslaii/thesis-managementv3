@@ -13,10 +13,12 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  LinearProgress,
 } from "@mui/material";
 import PlusIcon from "@heroicons/react/24/solid/PlusIcon";
 import { DataGrid } from "@mui/x-data-grid";
 import ThesisModal from "src/sections/thesis/thesis-modal";
+import ViewThesisModal from "src/sections/thesis/view-thesis";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -31,6 +33,20 @@ import {
   editThesis,
 } from "src/utils/thesis";
 
+function LinearProgressWithLabel(props) {
+  return (
+    <Box sx={{ display: "flex", alignItems: "center" }}>
+      <Box sx={{ width: "100%", mr: 1 }}>
+        <LinearProgress variant="determinate" {...props} />
+      </Box>
+      <Box sx={{ minWidth: 35 }}>
+        <Typography variant="body2" color="text.secondary">{`${Math.round(
+          props.value
+        )}%`}</Typography>
+      </Box>
+    </Box>
+  );
+}
 const Page = () => {
   const [openModal, setOpenModal] = useState(false);
   const [theses, setTheses] = useState([]);
@@ -38,26 +54,18 @@ const Page = () => {
   const [editingThesis, setEditingThesis] = useState(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedIdForDelete, setSelectedIdForDelete] = useState(null);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedThesis, setSelectedThesis] = useState(null);
 
   const handleSubmitThesis = async (formData) => {
     if (isEdit && editingThesis) {
       await editThesis(editingThesis.id, formData);
       // Optimistically update the UI
-      setTheses(
-        theses.map((t) =>
-          t.id === editingThesis.id ? { ...t, ...formData, createdAt: t.createdAt } : t
-        )
-      );
     } else {
       const newThesis = await addThesis(formData);
       // Assuming addThesis returns the new thesis with its ID
-      setTheses([
-        ...theses,
-        {
-          ...newThesis,
-          createdAt: new Date(newThesis.created_at.seconds * 1000).toLocaleDateString(),
-        },
-      ]);
+      console.log("newThhesis:", newThesis);
+      console.log("Thesis:", theses);
     }
     handleCloseModal();
   };
@@ -102,8 +110,9 @@ const Page = () => {
           <IconButton
             color="primary"
             onClick={() => {
-              /* handle view action */
-              console.log(params.row.id);
+              const thesisData = theses.find((thesis) => thesis.id === params.row.id);
+              setSelectedThesis(thesisData);
+              setViewModalOpen(true);
             }}
           >
             <VisibilityIcon />
@@ -134,7 +143,14 @@ const Page = () => {
     { field: "topic_title", headerName: "Title", width: 200 },
     { field: "advisers", headerName: "Adviser", width: 150 },
     { field: "createdAt", headerName: "Started At", width: 150 },
-    { field: "progress", headerName: "Progress", width: 150 },
+    {
+      field: "progress",
+      headerName: "Progress",
+      width: 150,
+      renderCell: (params) => (
+        <LinearProgressWithLabel value={parseInt(params.row.progress)} sx={{ width: 75 }} />
+      ),
+    },
     { field: "remarks", headerName: "Remarks", width: 150 },
   ];
 
@@ -193,6 +209,11 @@ const Page = () => {
         onSubmit={handleSubmitThesis}
         isEdit={isEdit}
         thesisData={editingThesis}
+      />
+      <ViewThesisModal
+        open={viewModalOpen}
+        handleClose={() => setViewModalOpen(false)}
+        thesisData={selectedThesis}
       />
     </>
   );
